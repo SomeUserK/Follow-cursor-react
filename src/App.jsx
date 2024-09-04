@@ -6,17 +6,25 @@ function App() {
     x: 0,
     y: 0,
   });
+  const [enabledFollow, setEnabledFollow] = useState(false);
 
   useEffect(() => {
     console.log('Montaje');
-
-    window.addEventListener('mousemove', e => {
+    const handleMouseMove = e => {
       setPosition({
         x: e.clientX,
         y: e.clientY,
       });
-    });
-  }, []);
+    };
+
+    if (enabledFollow) window.addEventListener('mousemove', handleMouseMove);
+
+    // Funcion que se ejecuta cuando se desmonta el componente (CLOSURE)
+    return () => {
+      console.log('Desmontaje');
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [enabledFollow]);
 
   return (
     <>
@@ -31,11 +39,21 @@ function App() {
           top: '-50px',
           left: '-50px',
           transform: `translate(${position.x}px, ${position.y}px)`,
+          opacity: enabledFollow ? '1' : '0',
+          transition: 'opacity 0.5s',
         }}
       ></div>
-      <h1>
+      <h1
+        style={{
+          opacity: enabledFollow ? '1' : '0',
+          transition: 'opacity 0.5s',
+        }}
+      >
         X: {position.x}, Y: {position.y}
       </h1>
+      <button onClick={() => setEnabledFollow(!enabledFollow)}>
+        {enabledFollow ? 'Desactivar' : 'Activar'} Seguimiento
+      </button>
     </>
   );
 }
